@@ -1,44 +1,64 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useCallback, useMemo, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import { Button } from "@/components/ui/button";
 import { CreationEditor } from "@/features/creation/components/CreationEditor";
 import { CreationOverview } from "@/features/creation/components/CreationOverview";
-import type { GiftItem, SelectedGiftCard } from "@/features/creation/types";
+import type {
+  CreationDraft,
+  GiftItem,
+  PresentationAudio,
+  PresentationThemeId,
+  SelectedGiftCard,
+} from "@/features/creation/types";
+interface CreationLocationState {
+  draft?: CreationDraft;
+}
+
+function fileToDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        resolve(reader.result);
+      } else {
+        reject(new Error("Falha ao ler arquivo."));
+      }
+    };
+    reader.onerror = () => reject(new Error("Falha ao ler arquivo."));
+    reader.readAsDataURL(file);
+  });
+}
 
 export function CreationPage() {
   const navigate = useNavigate();
-  const [items, setItems] = useState<GiftItem[]>([]);
+  const location = useLocation();
+  const locationState = location.state as CreationLocationState | null;
+  const initialDraft = locationState?.draft;
+
+  const [items, setItems] = useState<GiftItem[]>(initialDraft?.items ?? []);
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [selectedGiftCard, setSelectedGiftCard] =
-    useState<SelectedGiftCard | null>(null);
+    useState<SelectedGiftCard | null>(initialDraft?.selectedGiftCard ?? null);
+  const [selectedAudio, setSelectedAudio] = useState<PresentationAudio | null>(
+    initialDraft?.selectedAudio ?? null
+  );
+  const [selectedThemeId, setSelectedThemeId] =
+    useState<PresentationThemeId>(initialDraft?.selectedThemeId ?? "romantic-hearts");
   const [draftText, setDraftText] = useState("");
-  const objectUrlsRef = useRef<string[]>([]);
 
   const selectedItem = useMemo(
     () => items.find((item) => item.id === selectedItemId) ?? null,
     [items, selectedItemId]
   );
 
-  useEffect(() => {
-    const objectUrls = objectUrlsRef;
-    return () => {
-      objectUrls.current.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, []);
-
-  const handleAddImages = useCallback((files: File[]) => {
-    const mappedItems: GiftItem[] = files.map((file) => {
-      const imageUrl = URL.createObjectURL(file);
-      objectUrlsRef.current.push(imageUrl);
-
-      return {
+  const handleAddImages = useCallback(async (files: File[]) => {
+    const mappedItems: GiftItem[] = await Promise.all(
+      files.map(async (file) => ({
         id: crypto.randomUUID(),
-        image: imageUrl,
+        image: await fileToDataUrl(file),
         text: "",
-      };
-    });
+      }))
+    );
 
     setItems((prevItems) => [...prevItems, ...mappedItems]);
   }, []);
@@ -73,21 +93,28 @@ export function CreationPage() {
     setSelectedGiftCard(giftCardSelection);
   }, []);
 
+  const handleSelectAudio = useCallback(async (file: File) => {
+    setSelectedAudio({
+      name: file.name,
+      type: file.type,
+      url: await fileToDataUrl(file),
+    });
+  }, []);
+
+  const handleStartFinalize = useCallback(() => {
+    const draft: CreationDraft = {
+      items,
+      selectedGiftCard,
+      selectedAudio,
+      selectedThemeId,
+    };
+
+    navigate("/create/finalize", { state: { draft } });
+  }, [items, navigate, selectedAudio, selectedGiftCard, selectedThemeId]);
+
   return (
     <main className="min-h-screen bg-background">
       <div className="mx-auto w-full max-w-md p-4">
-        <div className="mb-4">
-          <Button
-            type="button"
-            variant="ghost"
-            className="gap-2 px-2 text-zinc-700"
-            onClick={() => navigate("/")}
-          >
-            <ArrowLeft className="size-4" />
-            Voltar para inicio
-          </Button>
-        </div>
-
         {selectedItem ? (
           <CreationEditor
             item={selectedItem}
@@ -103,6 +130,12 @@ export function CreationPage() {
             onSelectItem={handleSelectItem}
             selectedGiftCard={selectedGiftCard}
             onSaveGiftCard={handleSaveGiftCard}
+            selectedAudio={selectedAudio}
+            onSelectAudio={handleSelectAudio}
+            selectedThemeId={selectedThemeId}
+            onSelectTheme={setSelectedThemeId}
+            canFinalize={items.length > 0}
+            onFinalize={handleStartFinalize}
           />
         )}
       </div>

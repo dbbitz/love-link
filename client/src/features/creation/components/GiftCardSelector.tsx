@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
-import { Check, Gift, Store } from "lucide-react";
+import { Check, ChevronRight, Gift, Store, Ticket } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -96,48 +95,43 @@ export function GiftCardSelector({
   };
 
   return (
-    <section className="space-y-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="space-y-1">
-          <h2 className="text-base font-semibold text-zinc-900">Gift card</h2>
-          <p className="text-xs text-zinc-600">
-            Escolha um cupom de presente para completar a surpresa.
-          </p>
-        </div>
-        <Badge variant="outline">Mock</Badge>
-      </div>
-
-      {selectedGiftCard ? (
-        <div className="rounded-lg border border-rose-200 bg-rose-50 p-3">
-          <p className="text-xs text-zinc-600">Cupom selecionado</p>
-          <p className="mt-1 text-sm font-semibold text-zinc-900">
-            {selectedGiftCard.companyName} - R$ {selectedGiftCard.amount}
-          </p>
-        </div>
-      ) : (
-        <p className="rounded-lg border border-dashed border-zinc-300 bg-white p-3 text-sm text-zinc-500">
-          Nenhum cupom selecionado.
-        </p>
-      )}
-
-      <Button
+    <section className="space-y-2">
+      <button
         type="button"
-        variant="outline"
-        className="h-11 w-full justify-center gap-2"
         onClick={() => handleOpenChange(true)}
+        className="flex w-full items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-left transition-colors hover:bg-zinc-100"
       >
-        <Gift className="size-4" />
-        {selectedGiftCard ? "Editar cupom" : "Adicionar cupom"}
-      </Button>
+        <div className="min-w-0 space-y-0.5">
+          <p className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-900">
+            <Ticket className="size-4 text-rose-500" />
+            Gift card
+          </p>
+          <p className="truncate text-xs text-zinc-600">
+            {selectedGiftCard
+              ? `${selectedGiftCard.companyName} - R$ ${selectedGiftCard.amount}`
+              : "Nenhum cupom selecionado"}
+          </p>
+        </div>
+        <ChevronRight className="size-4 shrink-0 text-zinc-500" />
+      </button>
 
       <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-        <DialogContent className="top-auto bottom-0 w-[calc(100%-1rem)] max-w-md -translate-x-1/2 translate-y-0 rounded-b-none rounded-t-2xl p-5 sm:max-w-md">
+        <DialogContent className="top-auto bottom-0 w-[calc(100%-1rem)] max-h-[86vh] max-w-md -translate-x-1/2 translate-y-0 overflow-y-auto rounded-b-none rounded-t-2xl p-5 sm:max-w-md">
           <DialogHeader className="pr-7">
             <DialogTitle>Escolha seu gift card</DialogTitle>
             <DialogDescription>
               Selecione uma empresa e depois escolha um valor pre-definido.
             </DialogDescription>
           </DialogHeader>
+
+          {selectedGiftCard && (
+            <div className="rounded-lg border border-rose-200 bg-rose-50 p-3">
+              <p className="text-xs text-zinc-600">Selecionado atualmente</p>
+              <p className="mt-1 text-sm font-semibold text-zinc-900">
+                {selectedGiftCard.companyName} - R$ {selectedGiftCard.amount}
+              </p>
+            </div>
+          )}
 
           <div className="space-y-3">
             <p className="text-xs font-medium uppercase text-zinc-500">
@@ -204,10 +198,11 @@ export function GiftCardSelector({
             </Button>
             <Button
               type="button"
-              className="bg-rose-500 text-white hover:bg-rose-600"
+              className="gap-2 bg-rose-500 text-white hover:bg-rose-600"
               disabled={!activeAmount}
               onClick={handleConfirmSelection}
             >
+              <Gift className="size-4" />
               Confirmar
             </Button>
           </div>

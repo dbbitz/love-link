@@ -3,9 +3,26 @@
 ## Rodando local sem Docker
 
 ```bash
+cp .env.example .env
 npm install
 npm run dev
 ```
+
+## Firebase (Auth + Firestore)
+
+Preencha as variaveis no arquivo `.env` com os dados do seu projeto Firebase:
+
+- `VITE_FIREBASE_API_KEY`
+- `VITE_FIREBASE_AUTH_DOMAIN`
+- `VITE_FIREBASE_PROJECT_ID`
+- `VITE_FIREBASE_STORAGE_BUCKET`
+- `VITE_FIREBASE_MESSAGING_SENDER_ID`
+- `VITE_FIREBASE_APP_ID`
+
+No Console do Firebase, habilite:
+
+- Authentication > Sign-in method > Email/Password
+- Firestore Database (modo de desenvolvimento para MVP)
 
 ## Containers
 

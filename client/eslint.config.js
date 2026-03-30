@@ -42,4 +42,10 @@ export default defineConfig([
       "react-refresh/only-export-components": "off",
     },
   },
+  {
+    files: ["src/shared/auth/**/*.{ts,tsx}"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
 ]);

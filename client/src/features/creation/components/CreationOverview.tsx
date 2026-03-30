@@ -1,8 +1,17 @@
 import type { ChangeEvent } from "react";
-import { Plus } from "lucide-react";
+import { Plus, Rocket } from "lucide-react";
 
+import { Button } from "@/components/ui/button";
 import { GiftCardSelector } from "@/features/creation/components/GiftCardSelector";
-import type { GiftItem, SelectedGiftCard } from "@/features/creation/types";
+import { MusicSelector } from "@/features/creation/components/MusicSelector";
+import { PresentationSimulator } from "@/features/creation/components/PresentationSimulator";
+import { ThemeSelector } from "@/features/creation/components/ThemeSelector";
+import type {
+  GiftItem,
+  PresentationAudio,
+  PresentationThemeId,
+  SelectedGiftCard,
+} from "@/features/creation/types";
 
 interface CreationOverviewProps {
   items: GiftItem[];
@@ -10,6 +19,12 @@ interface CreationOverviewProps {
   onSelectItem: (itemId: string) => void;
   selectedGiftCard: SelectedGiftCard | null;
   onSaveGiftCard: (giftCard: SelectedGiftCard) => void;
+  selectedAudio: PresentationAudio | null;
+  onSelectAudio: (file: File) => void;
+  selectedThemeId: PresentationThemeId;
+  onSelectTheme: (themeId: PresentationThemeId) => void;
+  canFinalize: boolean;
+  onFinalize: () => void;
 }
 
 export function CreationOverview({
@@ -18,6 +33,12 @@ export function CreationOverview({
   onSelectItem,
   selectedGiftCard,
   onSaveGiftCard,
+  selectedAudio,
+  onSelectAudio,
+  selectedThemeId,
+  onSelectTheme,
+  canFinalize,
+  onFinalize,
 }: CreationOverviewProps) {
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? []);
@@ -79,6 +100,34 @@ export function CreationOverview({
         selectedGiftCard={selectedGiftCard}
         onSaveGiftCard={onSaveGiftCard}
       />
+
+      <MusicSelector
+        selectedAudio={selectedAudio}
+        onSelectAudio={onSelectAudio}
+      />
+
+      <ThemeSelector
+        selectedThemeId={selectedThemeId}
+        onSelectTheme={onSelectTheme}
+      />
+
+      <PresentationSimulator
+        items={items}
+        selectedGiftCard={selectedGiftCard}
+        selectedAudio={selectedAudio}
+        selectedThemeId={selectedThemeId}
+      />
+
+      <Button
+        type="button"
+        size="lg"
+        className="h-12 w-full bg-emerald-600 text-white hover:bg-emerald-700"
+        disabled={!canFinalize}
+        onClick={onFinalize}
+      >
+        <Rocket className="size-4" />
+        Finalizar apresentacao
+      </Button>
     </section>
   );
 }
