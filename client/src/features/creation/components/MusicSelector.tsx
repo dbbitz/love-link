@@ -41,12 +41,14 @@ export function MusicSelector({
       <button
         type="button"
         onClick={() => setIsOpen(true)}
+        disabled={true}
         className="flex w-full items-center justify-between rounded-xl border border-zinc-200 bg-zinc-50 p-3 text-left transition-colors hover:bg-zinc-100"
       >
         <div className="min-w-0 space-y-0.5">
           <p className="inline-flex items-center gap-2 text-sm font-semibold text-zinc-900">
             <Music2 className="size-4 text-rose-500" />
-            Musica da apresentacao
+            Musica da apresentacao 
+            <p className="text-xs text-zinc-500">(em breve...)</p>
           </p>
           <p className="truncate text-xs text-zinc-600">
             {selectedAudio
@@ -92,6 +94,7 @@ export function MusicSelector({
             variant="outline"
             className="h-11 w-full justify-center gap-2"
             onClick={handleOpenPicker}
+            disabled={true}
           >
             <Upload className="size-4" />
             {selectedAudio ? "Trocar musica" : "Adicionar musica"}
